@@ -1,4 +1,5 @@
-lang="ru">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -44,6 +45,7 @@ h2{font-size:12px;letter-spacing:4px;text-align:center;color:#d4c5a0;font-weight
 .msg.info{display:block;background:rgba(212,197,160,.06);border:1px solid rgba(212,197,160,.25);color:#b8a880}
 .final{font-size:13px;line-height:1.8;text-align:center;padding:10px 0}
 .final .big{font-size:16px;letter-spacing:2px;margin:10px 0}
+.final video{width:100%;border-radius:4px;margin:12px 0;border:1px solid #2a2a2a}
 .letter{font-size:12px;line-height:1.7;text-align:left;padding:10px 4px;color:#c8b890}
 .letter .head{font-size:14px;letter-spacing:2px;text-align:center;color:#d4c5a0;margin-bottom:10px}
 .letter .center{text-align:center;font-size:14px;line-height:1.9}
@@ -75,7 +77,7 @@ var L19err=0;
 var bossErr=0;
 
 var SNK_CODES=['SNK-001','SNK-777','SNK-QW3','SNK-Z9X','SNK-KT5','SNK-MZ7','SNK-PL2','SNK-RD8','SNK-VN4','SNK-BG6'];
-var PWR_CODES=['PWR-002','PWR-888','PWR-BR4','PWR-LP9','PWR-KT5','PWR-MZ7'];
+var PWR_CODES=['PWR-002','PWR-888','PWR-BR4','PWR-LP9','PWR-KT5'];
 
 function goNext(name,ms){
   S.nextFunc = name;
@@ -84,11 +86,7 @@ function goNext(name,ms){
     if(typeof window[name]==='function') window[name]();
   }, ms);
 }
-
-function checkCrit(){
-  if(S.inBoss) return;
-  if((S.hp<=20||S.en<=20)&&!S.inCrit){showCritScreen()}
-}
+function checkCrit(){if(S.inBoss) return;if((S.hp<=20||S.en<=20)&&!S.inCrit){showCritScreen()}}
 function hp(n){S.hp=Math.max(0,Math.min(100,S.hp+n));setTimeout(checkCrit,60)}
 function en(n){S.en=Math.max(0,Math.min(100,S.en+n));setTimeout(checkCrit,60)}
 function xp(n){S.xp+=n}
@@ -103,7 +101,6 @@ function showSms(text,answer){
   d.innerHTML='<div class="h">📡 ВХОДЯЩЕЕ СООБЩЕНИЕ · NPC «СВЕТА»</div><div class="b">'+text+'</div><div class="a">'+answer+'</div><div class="x" onclick="hideSms()">[ закрыть ]</div>';
   document.body.appendChild(d);
 }
-
 function clearCrit(){
   if(S.critTimer)clearInterval(S.critTimer);S.critTimer=null;S.critSecs=0;S.critType=null;S.inCrit=false;
   box.classList.remove('critRed','critYellow','critOrange');
@@ -116,7 +113,6 @@ function callCurrent(){
   if(target && typeof window[target]==='function') window[target]();
   else start();
 }
-
 function showCritScreen(){
   if(S.inCrit)return;
   var needHP=S.hp<=20;
@@ -142,7 +138,6 @@ function showCritScreen(){
   c.innerHTML='<div class="badge" style="border-color:#c44;color:#c44">СРОЧНО</div><div class="p" style="text-align:center"><b>'+title+'</b><br><br>'+sub+'<br><br>⏱ <b><span id="critT">'+fmt(S.critSecs)+'</span></b></div><input class="inp" id="a" placeholder="'+ph+'" autocomplete="off"><div class="msg" id="m"></div><button class="btn" onclick="critCheck()">АКТИВИРОВАТЬ</button>';
   window.scrollTo(0,0);
 }
-
 function critCheck(){
   var x=norm(document.getElementById('a').value);
   var needHP=S.hp<=20;
@@ -165,7 +160,6 @@ function critCheck(){
     setTimeout(callCurrent,1200);
   }
 }
-
 function show(h,funcName){
   if(funcName)S.currentFunc=funcName;
   if(S.inCrit)return;
@@ -175,9 +169,7 @@ function show(h,funcName){
 function err(t){var m=document.getElementById('m');if(m){m.className='msg err';m.textContent=t}}
 function ok(t){var m=document.getElementById('m');if(m){m.className='msg ok';m.textContent=t}}
 function v(id){return document.getElementById(id).value.toLowerCase().trim()}
-
 function dmg(n){hp(-n);if(S.hp<=0){die('hp');return true}return false}
-
 function die(reason){
   clearCrit();hideSms();
   if(bossTimer)clearInterval(bossTimer);bossTimer=null;
@@ -192,7 +184,6 @@ function die(reason){
 function restart(){S={xp:0,hp:100,en:100,frag:[],critTimer:null,critSecs:0,critType:null,bossKills:0,save:null,currentFunc:null,nextFunc:null,inCrit:false,inBoss:false,usedSnk:[],usedPwr:[]};L19err=0;bossErr=0;clearCrit();hideSms();if(bossTimer)clearInterval(bossTimer);if(finalTimer)clearInterval(finalTimer);start()}
 function loadSave(){clearCrit();hideSms();S.hp=100;S.en=100;S.bossKills=0;S.inBoss=false;bossErr=0;if(S.save&&typeof S.save.func==='function')S.save.func();else start()}
 function savePoint(date,func){S.save={date:date,func:func}}
-
 function stat(){
   var hpCls=S.hp<=20?'red':'';
   var enCls=S.en<=20?'yellow':'';
@@ -311,9 +302,40 @@ function cFinal(){if(v('a')==='семья'){if(finalTimer)clearInterval(finalTim
 function bossDeath(){if(S.bossKills>=3){hideSms();S.inBoss=false;show('<div class="final"><div class="badge" style="border-color:#c44;color:#c44">💀 ПЕРСОНАЖ ПОГИБ</div><div class="big" style="color:#c44">NPC БОЛЬШЕ НЕ МОЖЕТ ПОМОЧЬ</div><hr style="border-color:#2a2a2a;margin:12px 0">Ты дошёл до финала.<br>Но босса не победил.<br><br><b>Открой последний конверт.</b></div><button class="btn" onclick="letter1()">ОТКРЫТЬ ПИСЬМО</button>','bossDeath');return}S.bossKills++;var qs=[{q:'📡 ВХОДЯЩЕЕ СООБЩЕНИЕ.\nИсточник: NPC «СВЕТА».\n\nТвой воин погиб.\nНо я ещё здесь.\n\nКакой мой любимый сериал?',a:['сверхъестественное','сверхъестественный']},{q:'📡 ВХОДЯЩЕЕ СООБЩЕНИЕ.\nИсточник: NPC «СВЕТА».\n\nТы снова погиб.\nНо я не сдамся.\n\nКакое моё любимое время года?',a:['зима','зимой','зиму']},{q:'📡 ВХОДЯЩЕЕ СООБЩЕНИЕ.\nИсточник: NPC «СВЕТА».\n\nТы снова погиб.\nЯ даю тебе последний шанс.\n\nКакой мой любимый праздник?',a:['новый год','новыйгод','нг']}];var qq=qs[S.bossKills-1];if(bossTimer)clearInterval(bossTimer);bossTimer=null;hideSms();window._bossReviveQ=qq;show(stat()+'<div class="badge" style="border-color:#c44;color:#c44">💀 СМЕРТЬ '+S.bossKills+'/3</div><div class="p">'+qq.q.replace(/\n/g,'<br>')+'</div><input class="inp" id="a" placeholder="ОТВЕТ" autocomplete="off"><div class="msg" id="m"></div><button class="btn" onclick="bossRevive()">ОТВЕТИТЬ</button>','bossDeath');}
 function bossRevive(){var x=v('a').replace(/\s/g,'');var qq=window._bossReviveQ,good=false;for(var i=0;i<qq.a.length;i++){if(x===qq.a[i].replace(/\s/g,'')){good=true;break}}if(good){S.hp=100;S.en=100;bossErr=0;ok('✅ СОЗНАНИЕ ВОССТАНОВЛЕНО.');setTimeout(function(){bossSecs=600;bossHintShown=false;if(bossTimer)clearInterval(bossTimer);bossTimer=setInterval(function(){bossSecs--;var el=document.getElementById('bossT');if(el)el.textContent=fmt(bossSecs);if(bossSecs<=120 && !bossHintShown){bossHintShown=true;var cur=bossQ[bossIdx];if(cur){showSms('Ты застрял.<br>Вот тебе подарок на день рождения.<br>Ответ на этот вопрос:',cur.a[0])}}if(bossSecs<=0){clearInterval(bossTimer);bossTimer=null;hideSms();die('timer')}},1000);bossShow()},1500)}else err('❌ ОТКАЗ.')}
 
-function letter1(){clearCrit();hideSms();S.inBoss=false;if(bossTimer)clearInterval(bossTimer);bossTimer=null;if(finalTimer)clearInterval(finalTimer);finalTimer=null;show('<div class="letter"><div class="head">✉️ ПИСЬМО</div><b>Любимый.</b><br><br><b>С днём рождения!</b><br><br>Поздравляю. Ты прошёл игру до конца. И я ни на секунду не сомневалась, что ты справишься.<br><br>Но самое интересное — впереди.<br><br>Потому что сейчас ты поймёшь:<br><br><b>самое ценное ты уже нашёл.</b><br><br><b>СЕМЬЯ.</b><br><br><b>Я, ты и наша Ульяна.</b><br><br><b>И то счастье, которое мы создаём вместе.</b><br><br>И, наверное, именно это я хотела подарить тебе сегодня —<br><br>не вещь, а напоминание о том, как сильно мы тебя любим.<br><br>С днём рождения, мой любимый.<br><br><b>Пусть твой новый LEVEL будет самым счастливым.</b><br><br>С любовью,<br><b>Света ❤️</b></div><button class="btn" onclick="letter2()">ДАЛЬШЕ</button>','letter1');}
-function letter2(){show('<div class="letter"><div class="head">💌 ПАПЕ<br><span style="font-size:11px;color:#8a7a5a">От Ульяны ❤️</span></div><div class="center">Папа!<br><br>Я пока маленькая и не умею писать сама.<br>Поэтому сегодня мама помогла мне.<br><br>Но я хочу, чтобы ты знал:<br><br><b>Ты мой папа.</b><br><b>Я тебя очень люблю.</b><br><br>С днём рождения.<br><br>❤️<br><br><b>Твоя Ульяна</b></div></div><button class="btn" onclick="finalBoss()">ОБЕРНУТЬСЯ</button>','letter2');}
-function finalBoss(){show('<div class="final"><div class="badge">ФИНАЛ</div><div class="big">LEVEL 32 COMPLETE.</div><hr style="border-color:#2a2a2a;margin:12px 0"><b>Но это только начало.</b><br><br>Ты прошёл игру.<br>Собрал все фрагменты.<br>Нашёл провизию.<br>Восстановил HP.<br><br>Но один предмет система всё это время скрывала.<br><br><b>Последняя координата:</b><br><br><div class="big" style="color:#d4c5a0">ВЫШЕ ТВОЕГО ТЕКУЩЕГО УРОВНЯ</div><br><span style="color:#8a7a5a;font-size:11px">Куда — догадайся сам.</span></div>','finalBoss');}
+/* === ПИСЬМО СВЕТЫ === */
+function letter1(){
+  clearCrit();hideSms();S.inBoss=false;
+  if(bossTimer)clearInterval(bossTimer);bossTimer=null;
+  if(finalTimer)clearInterval(finalTimer);finalTimer=null;
+  show('<div class="letter"><div class="head">✉️ ПИСЬМО</div><b>Любимый.</b><br><br><b>С днём рождения!</b><br><br>Поздравляю. Ты прошёл игру до конца. И я ни на секунду не сомневалась, что ты справишься.<br><br>Но самое интересное — впереди.<br><br>Потому что сейчас ты поймёшь:<br><br><b>самое ценное ты уже нашёл.</b><br><br><b>СЕМЬЯ.</b><br><br><b>Я, ты и наша Ульяна.</b><br><br><b>И то счастье, которое мы создаём вместе.</b><br><br>И, наверное, именно это я хотела подарить тебе сегодня —<br><br>не вещь, а напоминание о том, как сильно мы тебя любим.<br><br>С днём рождения, мой любимый.<br><br><b>Пусть твой новый LEVEL будет самым счастливым.</b><br><br>С любовью,<br><b>Света ❤️</b></div><button class="btn" onclick="letter2()">ДАЛЬШЕ</button>','letter1');
+}
+
+/* === ПИСЬМО УЛЬЯНЫ === */
+function letter2(){
+  show('<div class="letter"><div class="head">💌 ПАПЕ<br><span style="font-size:11px;color:#8a7a5a">От Ульяны ❤️</span></div><div class="center">Папа!<br><br>Я пока маленькая и не умею писать сама.<br>Поэтому сегодня мама помогла мне.<br><br>Но я хочу, чтобы ты знал:<br><br><b>Ты мой папа.</b><br><b>Я тебя очень люблю.</b><br><br>С днём рождения.<br><br>❤️<br><br><b>Твоя Ульяна</b></div></div><button class="btn" onclick="videoUlyana()">ДАЛЬШЕ</button>','letter2');
+}
+
+/* === ВИДЕО УЛЬЯНЫ === */
+function videoUlyana(){
+  show('<div class="final">'+
+    '<div class="badge">🎥 ВИДЕО</div>'+
+    '<p style="font-size:12px;color:#b8a880;margin-bottom:10px">Ульяна записала для тебя сообщение.</p>'+
+    '<video controls playsinline preload="metadata" style="width:100%;border-radius:4px;border:1px solid #2a2a2a;margin:12px 0">'+
+    '<source src="https://gh7zt2gw2w-del.github.io/Level32/IMG_5244%202.mov" type="video/quicktime">'+
+    '<source src="https://gh7zt2gw2w-del.github.io/Level32/IMG_5244%202.mov" type="video/mp4">'+
+    'Твой браузер не поддерживает видео.'+
+    '</video>'+
+    '</div>'+
+    '<button class="btn" onclick="finalBoss()">ДАЛЬШЕ</button>','videoUlyana');
+}
+
+/* === ФИНАЛ === */
+function finalBoss(){
+  show('<div class="final"><div class="badge">ФИНАЛ</div><div class="big">LEVEL 32 COMPLETE.</div><hr style="border-color:#2a2a2a;margin:12px 0"><b>Но это только начало.</b><br><br>Ты прошёл игру.<br>Собрал все фрагменты.<br>Нашёл провизию.<br>Восстановил HP.<br><br>Но один предмет система всё это время скрывала.<br><br><b>Последняя координата:</b><br><br><div class="big" style="color:#d4c5a0">К * Р * Д * Р</div><br><b>Ты получил свой легендарный лут.</b></div><button class="btn" onclick="podskazka()">ПОДСКАЗКА</button>','finalBoss');
+}
+function podskazka(){
+  show('<div class="final"><div class="badge">ПОДСКАЗКА</div><hr style="border-color:#2a2a2a;margin:12px 0"><div class="big">Твой подарок ждёт на антресоли.</div></div>','podskazka');
+}
 
 start();
 </script>
